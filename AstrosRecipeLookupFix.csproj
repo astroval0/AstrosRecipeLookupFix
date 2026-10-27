@@ -1,0 +1,61 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <Version>$([System.Text.RegularExpressions.Regex]::Match($([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)\modinfo.json')), '"version"\s*:\s*"([^"]+)"').Groups[1].Value)</Version>
+        <VintageStoryDir>$(APPDATA)\Vintagestory</VintageStoryDir>
+        <ModInstallDir>$(APPDATA)\VintagestoryData\Mods\AstrosRecipeLookupFix</ModInstallDir>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Reference Include="VintagestoryAPI">
+            <HintPath>$(VintageStoryDir)\VintagestoryAPI.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+
+        <Reference Include="VintagestoryLib">
+            <HintPath>$(VintageStoryDir)\VintagestoryLib.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+
+        <Reference Include="0Harmony">
+            <HintPath>$(VintageStoryDir)\Lib\0Harmony.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="modinfo.json" CopyToOutputDirectory="PreserveNewest"/>
+        <None Update="modicon.png" CopyToOutputDirectory="PreserveNewest"/>
+        <None Update="assets\**\*" CopyToOutputDirectory="PreserveNewest"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="src\"/>
+    </ItemGroup>
+
+    <Target Name="InstallMod" AfterTargets="Build">
+        <ItemGroup>
+            <ModAssets Include="$(TargetDir)assets\**\*"/>
+        </ItemGroup>
+        <Copy SourceFiles="$(TargetPath);$(TargetDir)$(TargetName).pdb;$(TargetDir)modinfo.json;$(TargetDir)modicon.png" DestinationFolder="$(ModInstallDir)"/>
+        <Copy SourceFiles="@(ModAssets)" DestinationFolder="$(ModInstallDir)\assets\%(RecursiveDir)"/>
+    </Target>
+
+    <Target Name="PackageMod" AfterTargets="InstallMod" Condition="'$(Configuration)' == 'Release'">
+        <PropertyGroup>
+            <PackageDir>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)package\</PackageDir>
+            <ReleaseZip>$(MSBuildProjectDirectory)\bin\$(MSBuildProjectName)-$(Version).zip</ReleaseZip>
+        </PropertyGroup>
+        <ItemGroup>
+            <PackageAssets Include="$(TargetDir)assets\**\*"/>
+        </ItemGroup>
+        <RemoveDir Directories="$(PackageDir)"/>
+        <Copy SourceFiles="$(TargetPath);$(TargetDir)$(TargetName).pdb;$(TargetDir)modinfo.json;$(TargetDir)modicon.png;$(MSBuildProjectDirectory)\LICENSE" DestinationFolder="$(PackageDir)"/>
+        <Copy SourceFiles="@(PackageAssets)" DestinationFolder="$(PackageDir)assets\%(RecursiveDir)"/>
+        <ZipDirectory SourceDirectory="$(PackageDir)" DestinationFile="$(ReleaseZip)" Overwrite="true"/>
+    </Target>
+
+</Project>

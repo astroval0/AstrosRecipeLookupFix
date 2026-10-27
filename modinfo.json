@@ -1,0 +1,14 @@
+{
+  "type": "code",
+  "modId": "astrosrecipelookupfix",
+  "name": "Astro's Recipe Lookup Fix",
+  "authors": ["astroval0"],
+  "description": "stops crafting from freezing the server",
+  "version": "0.1.0",
+  "side": "Universal",
+  "requiredOnClient": false,
+  "requiredOnServer": false,
+  "dependencies": {
+    "game": "1.22.0"
+  }
+}
