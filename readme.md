@@ -2,6 +2,8 @@
 
 a Vintage Story mod that stops crafting from freezing the server.
 
+made for Vintage Story 1.22.7
+
 ## what it does
 
 - every time something in the crafting grid changes, the game looks up the recipe on the main thread. it checks every filled slot against every ingredient of every recipe, and with planks in over 1000 recipes that freezes the whole server when someone mass crafts.
